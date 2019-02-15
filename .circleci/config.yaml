@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7.1
+    steps:
+      - run:
+          name: install dependencies
+          command: |
+            sudo pip install jupyter
+            sudo pip install dataverk
+      - run:
+          name: run etl job and publish results
+          command: |
+            python etl.py
+            dataverk-cli publish
+workflows:
+   version: 2
+   nightly:
+     triggers:
+       - schedule:
+           # never runs since it is set to 31 of feb
+           cron: "0 0 5 31 2 ?"
+           filters:
+             branches:
+               only:
+                 - master
+     jobs:
+       - build
